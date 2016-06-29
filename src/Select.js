@@ -44,6 +44,7 @@ const Select = React.createClass({
 		clearValueText: stringOrNode,               // title for the "clear" control
 		clearable: React.PropTypes.bool,            // should it be possible to reset value
 		delimiter: React.PropTypes.string,          // delimiter to use to join multiple values for the hidden field value
+		hasSelectAll: React.PropTypes.bool,					// show button to select all options (for multiselect)
 		disabled: React.PropTypes.bool,             // whether the Select is disabled or not
 		escapeClearsValue: React.PropTypes.bool,    // whether escape clears the value when the menu is closed
 		filterOption: React.PropTypes.func,         // method to filter a single option (option, filterString)
@@ -86,6 +87,7 @@ const Select = React.createClass({
 		resetValue: React.PropTypes.any,            // value to use when you clear the control
 		scrollMenuIntoView: React.PropTypes.bool,   // boolean to enable the viewport to shift so that the full menu fully visible when engaged
 		searchable: React.PropTypes.bool,           // whether to enable searching feature or not
+		selectAllText: React.PropTypes.string,				// label for select all button
 		simpleValue: React.PropTypes.bool,          // pass the value to onChange as a simple value (legacy pre 1.0 mode), defaults to false
 		style: React.PropTypes.object,              // optional style to apply to the control
 		tabIndex: React.PropTypes.string,           // optional tab index of the control
@@ -113,6 +115,7 @@ const Select = React.createClass({
 			disabled: false,
 			escapeClearsValue: true,
 			filterOptions: true,
+			hasSelectAll: false,
 			ignoreAccents: true,
 			ignoreCase: true,
 			inputProps: {},
@@ -133,6 +136,7 @@ const Select = React.createClass({
 			resetValue: null,
 			scrollMenuIntoView: true,
 			searchable: true,
+			selectAllText: 'Select all',
 			simpleValue: false,
 			tabSelectsValue: true,
 			valueComponent: Value,
@@ -664,6 +668,25 @@ const Select = React.createClass({
 		}
 	},
 
+	renderSelectAll (options) {
+		let optionClass = classNames({
+			'Select-option': true,
+			'is-select-all': true,
+			'is-focused': false, // TODO: implement
+		});
+		return (
+			<div className={optionClass} onMouseDown={(event) => this.selectAll(event, options)}>
+		{this.props.selectAllText}
+	</div>
+	);
+	},
+
+	selectAll(event, options) {
+		event.preventDefault();
+		event.stopPropagation();
+		this.addValue(options)
+	},
+
 	renderLoading () {
 		if (!this.props.isLoading) return;
 		return (
@@ -951,6 +974,7 @@ const Select = React.createClass({
 						 onMouseDown={this.handleMouseDownOnMenu}>
 					{menu}
 				</div>
+			{ this.props.hasSelectAll && this.props.multi && options && options.length && this.renderSelectAll(options) || null }
 			</div>
 		);
 	},
